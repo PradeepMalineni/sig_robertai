@@ -7,3 +7,47 @@ transformers
 sentence-transformers
 sentencepiece
 python-dotenv
+
+
+@workspace Act as a senior software engineer with deep secure-coding expertise. 
+Use ONLY the existing Checkmarx (Cx) scan results already available in this VS Code workspace (e.g., the Checkmarx panel and files under `CX_scan_results/` such as `CxReport.json`, `CxSASTResults.xml`, `checkmarx.sarif`, or similar). Do NOT run any new scans and do NOT look for OSDrop10 or anything external.
+
+Task:
+1) Parse the existing Checkmarx report(s) in the workspace.
+2) For each finding, locate the exact file and line(s) in this repo and remediate the vulnerability **without changing business functionality, logic, API contracts, data models, or response formats**.
+3) All fixes must be **production-grade** (clean, readable, minimal, and standards-compliant).
+
+Security/Quality Guidelines:
+- Follow OWASP Top 10 and language-specific standards.
+- Prefer safe APIs and framework features; use parameterization for queries.
+- Validate, normalize, and constrain inputs from query/form/files.
+- Prevent path traversal and unsafe redirects.
+- Remove hard-coded secrets (move to config/env) without altering behavior.
+- Apply proper output encoding/escaping.
+- Keep error handling and logging consistent with existing patterns.
+- Do NOT introduce breaking changes. If a fix would alter behavior, propose a safer no-behavior-change alternative.
+
+Change Hygiene:
+- Before each edit, quote the Checkmarx finding (ID/rule, file, line) and summarize root cause in an inline comment.
+- Implement the smallest effective change; avoid unnecessary refactors.
+- If a tiny helper (e.g., input validator) is needed, place it in the most appropriate existing module and keep the interface stable.
+- Do not add dependencies unless strictly necessary; if added, justify in a comment and pin versions.
+
+Deliverables:
+- Apply fixes directly in files.
+- For each file changed, add a short header comment block:
+  - “Finding: <rule/ID>”
+  - “Cause: <1 line>”
+  - “Mitigation: <1 line> (no functional change)”
+- At the end, produce a concise summary listing: file → finding → mitigation.
+- Confirm: “All Checkmarx-reported findings present in the local VS Code report have been remediated with no functional or behavioral changes.”
+
+Post-pass:
+- Re-review your diffs to ensure identical runtime behavior (inputs/outputs, side effects, error codes).
+- Where relevant, add/adjust lightweight unit tests that assert the original behavior while covering the new security checks (no contract changes).
+
+@workspace Re-inspect each change and explain why the original behavior is preserved (inputs → outputs, error handling, returned status codes). Flag anything that could be risky.
+
+@workspace Ensure similar vulnerabilities are fixed consistently across modules (same validators, same encoding patterns), and deduplicate any near-identical helpers if safe to do so (no behavior change).
+
+@workspace Add or update minimal unit tests that prove behavior is unchanged while the vulnerability is mitigated (e.g., injection payloads are rejected/neutralized but valid inputs still succeed).
